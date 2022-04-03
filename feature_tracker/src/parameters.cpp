@@ -36,15 +36,20 @@ T readParam(ros::NodeHandle &n, std::string name)
 
 void readParameters(ros::NodeHandle &n)
 {
+    /*获取config文件路径*/
     std::string config_file;
     config_file = readParam<std::string>(n, "config_file");
+    /*打开config文件*/
     cv::FileStorage fsSettings(config_file, cv::FileStorage::READ);
-    if(!fsSettings.isOpened())
-    {
+    if(!fsSettings.isOpened()) {
         std::cerr << "ERROR: Wrong path to settings" << std::endl;
     }
+    /*读取鱼眼镜头mask文件*/
     std::string VINS_FOLDER_PATH = readParam<std::string>(n, "vins_folder");
-
+    if (FISHEYE == 1) {
+        FISHEYE_MASK = VINS_FOLDER_PATH + "config/fisheye_mask.jpg";
+    }
+    /*读取config文件中的相关参数*/
     fsSettings["image_topic"] >> IMAGE_TOPIC;
     fsSettings["imu_topic"] >> IMU_TOPIC;
     MAX_CNT = fsSettings["max_cnt"];
@@ -56,8 +61,6 @@ void readParameters(ros::NodeHandle &n)
     SHOW_TRACK = fsSettings["show_track"];
     EQUALIZE = fsSettings["equalize"];
     FISHEYE = fsSettings["fisheye"];
-    if (FISHEYE == 1)
-        FISHEYE_MASK = VINS_FOLDER_PATH + "config/fisheye_mask.jpg";
     CAM_NAMES.push_back(config_file);
 
     WINDOW_SIZE = 20;
@@ -65,10 +68,9 @@ void readParameters(ros::NodeHandle &n)
     FOCAL_LENGTH = 460;
     PUB_THIS_FRAME = false;
 
-    if (FREQ == 0)
+    if (FREQ == 0) {
         FREQ = 100;
-
+    }
+    /*析构文件读取句柄*/
     fsSettings.release();
-
-
 }

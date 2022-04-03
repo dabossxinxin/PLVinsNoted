@@ -24,6 +24,7 @@ bool first_image_flag = true;
 double frame_cnt = 0;
 double sum_time = 0.0;
 double mean_time = 0.0;
+/*处理图像的回调函数，一旦接收到图像即触发该回调函数*/
 void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
 {
     if(first_image_flag)
@@ -246,37 +247,35 @@ void img_callback(const sensor_msgs::ImageConstPtr &img_msg)
 
 int main(int argc, char **argv)
 {
+    /*初始化ros句柄*/   
     ros::init(argc, argv, "feature_tracker");
     ros::NodeHandle n("~");
     ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info);
+    /*读取VINS的一些配置参数*/
     readParameters(n);
-
-    for (int i = 0; i < NUM_OF_CAM; i++)
+    /*读取相机内参*/
+    for (int i = 0; i < NUM_OF_CAM; i++) {
         trackerData[i].readIntrinsicParameter(CAM_NAMES[i]);
-
-    if(FISHEYE)
-    {
-        for (int i = 0; i < NUM_OF_CAM; i++)
-        {
+    }
+    /*是否为鱼眼镜头*/
+    if(FISHEYE) {
+        for (int i = 0; i < NUM_OF_CAM; i++) {
             trackerData[i].fisheye_mask = cv::imread(FISHEYE_MASK, 0);
-            if(!trackerData[i].fisheye_mask.data)
-            {
+            if(!trackerData[i].fisheye_mask.data) {
                 ROS_INFO("load mask fail");
                 ROS_BREAK();
             }
-            else
+            else {
                 ROS_INFO("load mask success");
+            }
         }
     }
-
+    /*订阅图像原始数据*/
     ros::Subscriber sub_img = n.subscribe(IMAGE_TOPIC, 100, img_callback);
-
+    /*发布图像特征*/
     pub_img = n.advertise<sensor_msgs::PointCloud>("feature", 1000);
     pub_match = n.advertise<sensor_msgs::Image>("feature_img",1000);
-    /*
-    if (SHOW_TRACK)
-        cv::namedWindow("vis", cv::WINDOW_NORMAL);
-    */
+
     ros::spin();
     return 0;
 }

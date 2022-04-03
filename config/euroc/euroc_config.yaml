@@ -1,11 +1,11 @@
 %YAML:1.0
 
-#common parameters
+#公共参数
 imu_topic: "/imu0"
 image_topic: "/cam0/image_raw"
-output_path: "/config/euroc/vins_result.txt"         # vins outputs will be wrttento vins_folder_path + output_path
+output_path: "/config/euroc/vins_result.txt"         # vins outputs will be written to vins_folder_path + output_path
 
-#camera calibration 
+#相机标定参数
 model_type: PINHOLE
 camera_name: camera
 image_width: 752
@@ -21,7 +21,7 @@ projection_parameters:
    cx: 3.630e+02
    cy: 2.481e+02
 
-# Extrinsic parameter between IMU and Camera.
+#相机与IMU之间的外参
 estimate_extrinsic: 1   # 0  Have an accurate extrinsic parameters. We will trust the following imu^R_cam, imu^T_cam, don't change it.
                         # 1  Have an initial guess about extrinsic parameters. We will optimize around your initial guess.
                         # 2  Don't know anything about extrinsic parameters. You don't need to give R,T. We will try to calibrate it. Do some rotation movement at beginning. 
@@ -42,21 +42,21 @@ extrinsicTranslation: !!opencv-matrix
    dt: d
    data: [-0.02,-0.06, 0.01]
 
-#feature traker paprameters
-max_cnt: 150            # max feature number in feature tracking
-min_dist: 30            # min distance between two features 
-freq: 10                # frequence (Hz) of publish tracking result. At least 10Hz for good estimation. If set 0, the frequence will be same as raw image 
+#图像特征跟踪参数
+max_cnt: 150            # 特征跟踪中设置的最大特征点提取数量
+min_dist: 30            # 两同名特征点之间的最小汉明距离
+freq: 10                # 特征跟踪结果发布频率.至少设置为10Hz.若设置为0,表示发布频率与图像输入的频率一致
 F_threshold: 1.0        # ransac threshold (pixel)
-show_track: 1           # publish tracking image as topic
-equalize: 1             # if image is too dark or light, trun on equalize to find enough features
-fisheye: 0              # if using fisheye, trun on it. A circle mask will be loaded to remove edge noisy points
+show_track: 1           # 将跟踪图像作为话题发布出去
+equalize: 1             # 若图像过暗||过亮，将图像进行直方图均衡已提取更特征
+fisheye: 0              # 若使用鱼眼相机.程序将加载一个圆形的mask以去掉鱼眼镜头周边畸变
 
-#optimization parameters
+#非线性优化参数
 max_solver_time: 0.04  # max solver itration time (ms), to guarantee real time
 max_num_iterations: 8   # max solver itrations, to guarantee real time
 keyframe_parallax: 10.0 # keyframe selection threshold (pixel)
 
-#imu parameters       The more accurate parameters you provide, the better performance
+#IMU参数，IMU参数越准确，则里程计的估计越准确
 acc_n: 0.2          # accelerometer measurement noise standard deviation. #0.2
 gyr_n: 0.02         # gyroscope measurement noise standard deviation.     #0.05
 acc_w: 0.0002         # accelerometer bias random work noise standard deviation.  #0.02
@@ -64,7 +64,7 @@ gyr_w: 2.0e-5       # gyroscope bias random work noise standard deviation.     #
 g_norm: 9.81007     # gravity magnitude
 
 
-#loop closure parameters
+#闭环检测参数
 loop_closure: 0   #if you want to use loop closure to minimize the drift, set loop_closure true and give your brief pattern file path and vocabulary file path accordingly;
                      #also give the camera calibration file same as feature_tracker node
 pattern_file: "/support_files/brief_pattern.yml"

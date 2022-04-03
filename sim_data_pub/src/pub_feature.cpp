@@ -8,31 +8,29 @@
 
 using namespace std;
 
+/*读取参数*/
 template <typename T>
 T readParam(ros::NodeHandle &n, std::string name)
 {
     T ans;
-    if (n.getParam(name, ans))
-    {
+    if (n.getParam(name, ans)) {
         ROS_INFO_STREAM("Loaded " << name << ": " << ans);
     }
-    else
-    {
+    else {
         ROS_ERROR_STREAM("Failed to load " << name);
         n.shutdown();
     }
     return ans;
 }
 
+/*读取时间戳&加速度计&陀螺仪数据*/
 void LoadPose(std::string filename, std::vector<double>& timestamp,std::vector<Eigen::Vector3d>& gyros, std::vector<Eigen::Vector3d>& accs)
 {
-
     std::ifstream f;
     f.open(filename.c_str());
 
-    if(!f.is_open())
-    {
-        std::cerr << " can't open LoadFeatures file "<<std::endl;
+    if(!f.is_open()) {
+        std::cerr << "Can't Open LoadFeatures File..." << std::endl;
         return;
     }
 
@@ -75,9 +73,9 @@ void LoadPose(std::string filename, std::vector<double>& timestamp,std::vector<E
 
 }
 
+/*读取图像中点特征信息*/
 void LoadPointObs(std::string filename, std::vector<Eigen::Vector2d>& obs)
 {
-
     std::ifstream f;
     f.open(filename.c_str());
 
@@ -108,12 +106,11 @@ void LoadPointObs(std::string filename, std::vector<Eigen::Vector2d>& obs)
             ss>>ob(1);
 
             obs.push_back(ob);
-
         }
     }
-
 }
 
+/*读取图像中线特征信息*/
 void LoadLineObs(std::string filename, std::vector<Eigen::Vector4d>& obs)
 {
 
@@ -178,7 +175,6 @@ int main(int argc, char **argv)
     //while (ros::ok())
     for (int i = 0; i < timestamp.size(); ++i)
     {
-
         stringstream ss;
         ss <<sim_file<< "keyframe/all_points_"<< i <<".txt";
         std::vector<Eigen::Vector2d> pobs;
